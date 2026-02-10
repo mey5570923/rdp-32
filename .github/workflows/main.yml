@@ -1,54 +1,54 @@
-name: Windows-High-Performance-RDP
+name: Windows-Pro-VPN-Enabled
 
 on:
   workflow_dispatch:
 
 jobs:
-  heavy-task:
+  rdp-vpn:
     runs-on: windows-latest
     timeout-minutes: 360
 
     steps:
-      - name: 1. Unlock Maksimum Performa CPU
+      - name: 1. Optimasi Performa & Power
         run: |
-          # Mengatur skema daya ke 'Ultimate Performance' (jika ada) atau 'High Performance'
           powercfg /s 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
-          
-          # Meningkatkan prioritas proses latar belakang (Background Services)
-          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\PriorityControl' -Name "Win32PrioritySeparation" -Value 36
-          
-          # Mematikan Windows Defender agar tidak memakan resource CPU
           Set-MpPreference -DisableRealtimeMonitoring $true
-          Write-Host "✅ CPU & Power dioptimalkan untuk beban berat."
+          Write-Host "✅ Sistem Siap."
 
-      - name: 2. Instalasi RustDesk (Lightweight Remote)
+      - name: 2. Instalasi Chrome & Cloudflare WARP (VPN)
+        run: |
+          Write-Host "Menginstal Chrome dan Cloudflare WARP..."
+          choco install googlechrome cloudflare-warp -y
+          Write-Host "✅ Software terinstal."
+
+      - name: 3. Instalasi RustDesk (Remote Desktop)
         run: |
           $url = "https://github.com/rustdesk/rustdesk/releases/download/1.3.7/rustdesk-1.3.7-x86_64.exe"
           $out = "$env:TEMP\rustdesk.exe"
           Invoke-WebRequest -Uri $url -OutFile $out
           Start-Process $out -ArgumentList "--install" -Wait
 
-      - name: 3. Setup Password & Get ID
+      - name: 4. Konfigurasi RustDesk
         run: |
-          & "C:\Program Files\RustDesk\rustdesk.exe" --password KhususPerforma123
+          & "C:\Program Files\RustDesk\rustdesk.exe" --password VpnPro2026
           Start-Sleep -Seconds 20
           $id = & "C:\Program Files\RustDesk\rustdesk.exe" --get-id
           echo "RUST_ID=$id" >> $env:GITHUB_ENV
 
-      - name: 4. Informasi Akses VPS
+      - name: 5. Informasi Login & Instruksi VPN
         run: |
           Write-Host "`n==========================================" -ForegroundColor Cyan
-          Write-Host "🚀 HIGH PERFORMANCE RDP READY" -ForegroundColor Cyan
+          Write-Host "🚀 VPS RDP DENGAN VPN READY" -ForegroundColor Cyan
           Write-Host "=========================================="
           Write-Host "ID RUSTDESK : $env:RUST_ID" -ForegroundColor Yellow
-          Write-Host "PASSWORD    : KhususPerforma123" -ForegroundColor Yellow
-          Write-Host "PERFORMA    : Max CPU Priority"
+          Write-Host "PASSWORD    : VpnPro2026" -ForegroundColor Yellow
+          Write-Host "VPN TOOL    : Cloudflare WARP Terinstal"
           Write-Host "=========================================="
+          Write-Host "TIPS: Gunakan VPN di dalam Chrome (Extension) agar koneksi RDP tidak putus."
 
-      - name: 5. Menjaga Sesi (Keep Alive)
+      - name: 6. Menjaga Sesi
         run: |
-          # Loop dengan prioritas rendah agar tidak mengganggu tugas utama
           while ($true) {
-            Write-Host "[$(Get-Date -Format 'HH:mm:ss')] Sistem Berjalan pada Kapasitas Penuh..."
+            Write-Host "[$(Get-Date -Format 'HH:mm:ss')] VPS Running..."
             Start-Sleep -Seconds 300
           }
